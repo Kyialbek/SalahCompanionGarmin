@@ -22,6 +22,54 @@ monkeyc -f monkey.jungle -o bin/SalahCompanion.prg -y developer_key.der
 
 You need a Garmin developer key and a supported target device from `manifest.xml`.
 
+## Install on a Physical Garmin Watch
+
+Supported tested device: Garmin fēnix E 47 mm AMOLED
+
+Build target used: `fenixe`
+
+Final app file path:
+
+```text
+bin/SalahCompanion-fenixe.prg
+```
+
+Garmin Express can detect the watch, but it does not sideload local `.prg` or `.iq` files. For a local physical install, use File Transfer / MTP and copy the compiled `.prg` to the watch.
+
+1. Unlock the Garmin watch.
+2. Connect it to the Mac via USB.
+3. Choose File Transfer / MTP mode on the watch if prompted.
+4. Build the app for the exact device target:
+
+```bash
+monkeyc -d fenixe -f monkey.jungle -o bin/SalahCompanion-fenixe.prg -y keys/developer_key.der
+```
+
+5. Use MTP/File Transfer to upload:
+
+```text
+bin/SalahCompanion-fenixe.prg
+```
+
+to:
+
+```text
+GARMIN/Apps/
+```
+
+6. Unplug the watch.
+7. Wait 10-20 seconds.
+8. Open the watch app list and launch Salah Companion.
+9. If it does not appear, restart the watch.
+
+Troubleshooting:
+
+- If `/Volumes/GARMIN` does not appear on macOS, use MTP instead.
+- `monkeydo` and `mdd` are simulator/debug tools, not physical deployment tools.
+- Garmin Express detects the watch but does not provide local sideload.
+- ADB is not applicable.
+- The watch must be unlocked before MTP access works.
+
 ## Install
 
 For local testing, use Garmin Connect IQ simulator or Garmin's sideload/debug workflow for your watch model.
