@@ -1,4 +1,5 @@
 keys/
+.local-jdk/
 bin/*.debug.xml
 bin/external-mir/
 bin/internal-mir/
