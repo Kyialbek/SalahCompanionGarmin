@@ -1,0 +1,6 @@
+keys/
+bin/*.debug.xml
+bin/external-mir/
+bin/internal-mir/
+bin/gen/
+.DS_Store

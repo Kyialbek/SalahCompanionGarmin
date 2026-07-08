@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="1">
+    <iq:application
+        id="7B3C7F401A874F159A723B7F35C9D911"
+        type="watch-app"
+        name="@Strings.AppName"
+        entry="SalahCompanionApp"
+        launcherIcon="@Drawables.LauncherIcon"
+        minSdkVersion="3.2.0">
+        <iq:products>
+            <iq:product id="fenix7x"/>
+            <iq:product id="fenix7xpro"/>
+            <iq:product id="fenix7xpronowifi"/>
+            <iq:product id="fenix843mm"/>
+            <iq:product id="fenix847mm"/>
+            <iq:product id="fenix8pro47mm"/>
+            <iq:product id="fenix8solar47mm"/>
+            <iq:product id="fenix8solar51mm"/>
+            <iq:product id="vivoactive5"/>
+            <iq:product id="vivoactive6"/>
+        </iq:products>
+        <iq:permissions/>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+    </iq:application>
+</iq:manifest>

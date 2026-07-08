@@ -1,0 +1,6 @@
+<menus>
+    <menu id="MainMenu">
+        <menu-item id="reset_zikr" label="@Strings.ResetZikr"/>
+        <menu-item id="reset_prayer" label="@Strings.ResetPrayer"/>
+    </menu>
+</menus>
