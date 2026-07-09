@@ -1,4 +1,4 @@
 project.manifest = manifest.xml
-base.sourcePath = source
+base.sourcePath = source;source/screens;source/services;source/models;source/storage;source/components;source/utils;source/resources
 base.resourcePath = resources
 base.excludeAnnotations = test

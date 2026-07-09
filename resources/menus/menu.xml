@@ -1,6 +1,9 @@
 <menus>
     <menu id="MainMenu">
+        <menu-item id="home" label="@Strings.Home"/>
+        <menu-item id="reset_prayers" label="@Strings.ResetPrayers"/>
         <menu-item id="reset_zikr" label="@Strings.ResetZikr"/>
-        <menu-item id="reset_prayer" label="@Strings.ResetPrayer"/>
+        <menu-item id="calc_method" label="@Strings.CalcMethod"/>
+        <menu-item id="asr_madhhab" label="@Strings.AsrMadhhab"/>
     </menu>
 </menus>

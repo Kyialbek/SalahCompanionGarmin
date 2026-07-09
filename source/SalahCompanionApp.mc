@@ -6,7 +6,18 @@ class SalahCompanionApp extends Application.AppBase {
         AppBase.initialize();
     }
 
+    function onStart(state) {
+        StorageService.boot();
+        PrayerService.boot();
+        NotificationService.boot();
+    }
+
+    function onStop(state) {
+        StorageService.ensureToday();
+    }
+
     function getInitialView() {
-        return [ new SalahView(), new SalahDelegate() ];
+        var view = new SalahView();
+        return [ view, new SalahDelegate(view) ];
     }
 }

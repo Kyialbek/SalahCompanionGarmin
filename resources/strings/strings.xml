@@ -1,6 +1,21 @@
 <strings>
     <string id="AppName">Salah Companion</string>
     <string id="MenuTitle">Salah Companion</string>
+    <string id="Home">Home</string>
+    <string id="Qibla">Qibla</string>
+    <string id="Ramadan">Ramadan</string>
+    <string id="Stats">Stats</string>
+    <string id="ToggleFajr">Toggle Fajr</string>
+    <string id="ToggleDhuhr">Toggle Dhuhr</string>
+    <string id="ToggleAsrPrayer">Toggle Asr</string>
+    <string id="ToggleMaghrib">Toggle Maghrib</string>
+    <string id="ToggleIsha">Toggle Isha</string>
+    <string id="ResetPrayers">Reset Prayers</string>
     <string id="ResetZikr">Reset Zikr</string>
-    <string id="ResetPrayer">Reset Prayer</string>
+    <string id="TargetZikr">Tasbih Target</string>
+    <string id="CalcMethod">Calculation Method</string>
+    <string id="AsrMadhhab">Asr Standard/Hanafi</string>
+    <string id="ReminderOffset">Reminder Time</string>
+    <string id="HighContrast">High Contrast</string>
+    <string id="VibrationOnly">Vibration Only</string>
 </strings>

@@ -1,18 +1,31 @@
 using Toybox.WatchUi;
 
 class SalahDelegate extends WatchUi.BehaviorDelegate {
-    function initialize() {
+    var _view;
+
+    function initialize(view) {
         BehaviorDelegate.initialize();
+        _view = view;
+    }
+
+    function onPreviousPage() {
+        _view.previousScreen();
+        return true;
+    }
+
+    function onNextPage() {
+        _view.nextScreen();
+        return true;
     }
 
     function onSelect() {
-        SalahStore.addZikr(1);
+        _view.primaryAction();
         WatchUi.requestUpdate();
         return true;
     }
 
     function onBack() {
-        SalahStore.toggleCurrentPrayer();
+        _view.backAction();
         WatchUi.requestUpdate();
         return true;
     }
