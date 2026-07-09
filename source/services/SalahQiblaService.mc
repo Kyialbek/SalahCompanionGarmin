@@ -1,10 +1,29 @@
+using Toybox.Math;
+
 module SalahQiblaService {
     var _heading = null;
     var _smoothedHeading = null;
     var _lastError = null;
 
     function qiblaBearing() {
-        return SalahConstants.QIBLA_BEARING_NAPERVILLE;
+        var settings = CalculationService.settings();
+        var lat1 = degToRad(settings["lat"]);
+        var lon1 = degToRad(settings["lon"]);
+        var lat2 = degToRad(21.4225);
+        var lon2 = degToRad(39.8262);
+        var dLon = lon2 - lon1;
+        var y = Math.sin(dLon) * Math.cos(lat2);
+        var x = (Math.cos(lat1) * Math.sin(lat2)) - (Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon));
+        var bearing = radToDeg(Math.atan2(y, x));
+
+        while (bearing < 0) {
+            bearing += 360;
+        }
+        while (bearing >= 360) {
+            bearing -= 360;
+        }
+
+        return bearing.toNumber();
     }
 
     function hasHeading() {
@@ -49,5 +68,13 @@ module SalahQiblaService {
         }
 
         return "Calibrate compass";
+    }
+
+    function degToRad(value) {
+        return value * Math.PI / 180.0;
+    }
+
+    function radToDeg(value) {
+        return value * 180.0 / Math.PI;
     }
 }

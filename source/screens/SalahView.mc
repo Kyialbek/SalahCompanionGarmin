@@ -58,6 +58,8 @@ class SalahView extends WatchUi.View {
     function primaryAction() {
         if (SalahStorage.currentScreen() == SalahConstants.SCREEN_TASBIH) {
             TasbihService.increment();
+        } else if (SalahStorage.currentScreen() == SalahConstants.SCREEN_WOMEN) {
+            WomenService.togglePause();
         } else if (SalahStorage.currentScreen() == SalahConstants.SCREEN_HOME) {
             PrayerService.toggleCurrentCompletablePrayer();
         } else {
@@ -79,13 +81,19 @@ class SalahView extends WatchUi.View {
             NotificationService.checkDueReminder();
             var screen = SalahStorage.currentScreen();
             if (screen == SalahConstants.SCREEN_PRAYER_LIST) {
-                drawPrayerList(dc);
-            } else if (screen == SalahConstants.SCREEN_TIMELINE) {
                 drawTimeline(dc);
             } else if (screen == SalahConstants.SCREEN_TASBIH) {
                 drawTasbih(dc);
+            } else if (screen == SalahConstants.SCREEN_QIBLA) {
+                drawQibla(dc);
+            } else if (screen == SalahConstants.SCREEN_RAMADAN) {
+                drawRamadan(dc);
+            } else if (screen == SalahConstants.SCREEN_STATS) {
+                drawStats(dc);
             } else if (screen == SalahConstants.SCREEN_SETTINGS) {
                 drawSettings(dc);
+            } else if (screen == SalahConstants.SCREEN_WOMEN) {
+                drawWomen(dc);
             } else if (screen == SalahConstants.SCREEN_ABOUT) {
                 drawAbout(dc);
             } else {
@@ -138,6 +146,10 @@ class SalahView extends WatchUi.View {
         y += dc.getFontHeight(Graphics.FONT_XTINY) + 1;
         SalahUi.drawText(dc, centerX, y, Graphics.FONT_XTINY, CalculationService.FALLBACK_LOCATION, SalahConstants.MUTED);
         y += dc.getFontHeight(Graphics.FONT_XTINY) + gap;
+        if (WomenService.isPauseActive()) {
+            SalahUi.drawText(dc, centerX, y, Graphics.FONT_XTINY, "Tracking paused", SalahConstants.WARNING);
+            y += dc.getFontHeight(Graphics.FONT_XTINY) + 2;
+        }
         SalahUi.divider(dc, centerX, y, radius);
         y += gap;
         drawHomeActions(dc, centerX, y, radius, done, PrayerService.prayerName(currentPrayerKey));
@@ -212,14 +224,108 @@ class SalahView extends WatchUi.View {
         var rows = [
             ["Calculation", s["method"]["name"]],
             ["Madhhab", s["asrHanafi"] ? "Hanafi" : "Standard"],
-            ["Time", "12 hour"],
+            ["Time", StorageService.readBool(StorageService.TIME_FORMAT_KEY, false) ? "24 hour" : "12 hour"],
             ["Theme", SalahStorage.isHighContrast() ? "High contrast" : "AMOLED"],
             ["Font Size", "Adaptive"],
-            ["Vibration", SalahStorage.isVibrationOnly() ? "Only" : "On"],
-            ["Notifications", NotificationService.reminderLabel()],
-            ["Brightness", "Auto"]
+            ["Vibration", NotificationService.vibrationEnabled() ? "On" : "Off"],
+            ["Reminders", NotificationService.remindersEnabled() ? "On" : "Off"],
+            ["Timing", NotificationService.reminderLabel()]
         ];
         drawSettingsRows(dc, rows);
+    }
+
+    function drawQibla(dc) {
+        var width = dc.getWidth();
+        var height = dc.getHeight();
+        var centerX = width / 2;
+        var radius = (width < height ? width : height) / 2;
+        var compassRadius = SalahUi.clamp(radius / 2, 66, 96);
+        var headingAvailable = SalahQiblaService.hasHeading();
+        var bearing = headingAvailable ? SalahQiblaService.qiblaOffset() : SalahQiblaService.qiblaBearing();
+
+        SalahUi.clear(dc);
+        SalahUi.drawText(dc, centerX, 16, Graphics.FONT_SMALL, "Qibla", SalahUi.muted());
+        SalahUi.drawText(dc, centerX, 42, Graphics.FONT_SYSTEM_MEDIUM, SalahQiblaService.qiblaBearing() + " deg", SalahUi.accent());
+        SalahUi.drawCompass(dc, centerX, height / 2 + 8, compassRadius, bearing, headingAvailable);
+        SalahUi.drawText(dc, centerX, height - 38, Graphics.FONT_TINY, headingAvailable ? "Turn until arrow points up" : "Bearing from " + CalculationService.FALLBACK_LOCATION, headingAvailable ? SalahConstants.WHITE : SalahConstants.WARNING);
+        SalahUi.drawText(dc, centerX, height - 22, Graphics.FONT_XTINY, "Compass sensor optional", SalahUi.muted());
+    }
+
+    function drawRamadan(dc) {
+        var data = SalahRamadanService.today();
+        var width = dc.getWidth();
+        var height = dc.getHeight();
+        var centerX = width / 2;
+        var y = 18;
+
+        SalahUi.clear(dc);
+        SalahUi.drawText(dc, centerX, y, Graphics.FONT_SMALL, "Ramadan", SalahUi.muted());
+        y += 26;
+        SalahUi.drawText(dc, centerX, y, Graphics.FONT_SYSTEM_MEDIUM, data["isFastingWindow"] ? "Fasting Now" : "Prepare", SalahUi.accent());
+        y += 34;
+        drawMetric(dc, centerX, y, "Day", data["ramadanDay"], "basic Hijri estimate");
+        y += 44;
+        drawMetric(dc, centerX, y, "Suhoor cutoff", data["fajrTime"], data["suhoor"] + " left");
+        y += 44;
+        drawMetric(dc, centerX, y, "Iftar", data["maghribTime"], data["iftar"] + " left");
+        y += 44;
+        drawMetric(dc, centerX, y, "Fast length", data["fasting"], "Fajr to Maghrib");
+        SalahUi.drawText(dc, centerX, height - 18, Graphics.FONT_XTINY, "Ramadan detection is approximate", SalahConstants.MUTED);
+    }
+
+    function drawStats(dc) {
+        var stats = SalahStatsService.summary();
+        var rows = [
+            ["Today", stats["todayDone"] + "/" + SalahConstants.COMPLETABLE_PRAYER_COUNT],
+            ["Missed", "" + stats["todayMissed"]],
+            ["Week", stats["weekDone"] + "/" + stats["weekTotal"]],
+            ["Month", stats["monthDone"] + "/" + stats["monthTotal"]],
+            ["Streak", stats["currentStreak"] + "d"],
+            ["Best", stats["longestStreak"] + "d"],
+            ["Paused", stats["pausedDays"] + "d"]
+        ];
+        drawListScreen(dc, "Statistics", rows);
+    }
+
+    function drawWomen(dc) {
+        var rows = [
+            ["Women Mode", WomenService.isEnabled() ? "On" : "Off"],
+            ["Period Pause", WomenService.isPauseActive() ? "Active" : "Off"],
+            ["Pause Start", WomenService.pauseStartDate() == 0 ? "-" : "" + WomenService.pauseStartDate()],
+            ["Paused Days", "" + WomenService.pausedDays()],
+            ["Select", WomenService.isPauseActive() ? "End pause" : "Start pause"],
+            ["During pause", "No missed"]
+        ];
+        drawListScreen(dc, "Women Mode", rows);
+    }
+
+    function drawMetric(dc, centerX, y, label, value, caption) {
+        SalahUi.drawText(dc, centerX, y, Graphics.FONT_XTINY, label, SalahUi.muted());
+        SalahUi.drawText(dc, centerX, y + 14, Graphics.FONT_SMALL, value, SalahConstants.WHITE);
+        SalahUi.drawText(dc, centerX, y + 32, Graphics.FONT_XTINY, caption, SalahConstants.MUTED);
+    }
+
+    function drawListScreen(dc, title, rows) {
+        var width = dc.getWidth();
+        var height = dc.getHeight();
+        var centerX = width / 2;
+        var radius = (width < height ? width : height) / 2;
+        var top = 44;
+        var bottom = height - 24;
+        var rowH = (bottom - top) / rows.size();
+        var left = centerX - (radius * 0.56);
+        var right = centerX + (radius * 0.56);
+
+        SalahUi.clear(dc);
+        SalahUi.drawText(dc, centerX, 16, Graphics.FONT_SMALL, title, SalahUi.muted());
+
+        for (var i = 0; i < rows.size(); i += 1) {
+            var row = rows[i];
+            var textY = top + (i * rowH) + ((rowH - dc.getFontHeight(Graphics.FONT_XTINY)) / 2);
+            SalahUi.drawLeftText(dc, left, textY, Graphics.FONT_XTINY, row[0], SalahUi.muted());
+            dc.setColor(SalahConstants.WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(right, textY, Graphics.FONT_XTINY, row[1], Graphics.TEXT_JUSTIFY_RIGHT);
+        }
     }
 
     function drawAbout(dc) {

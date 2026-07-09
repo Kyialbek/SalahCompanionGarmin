@@ -14,8 +14,13 @@ It is separate from the Next.js phone/web app because Garmin watches cannot inst
 - Press Select on Home to toggle the current completable prayer.
 - Press Select on Tasbih to increment zikr.
 - Press Back on Tasbih to reset zikr; Back on other screens returns Home.
-- Press Up/Down to move through Home, Prayer List, Timeline, Tasbih, Settings, and About.
+- Press Up/Down to move through Home, Prayer Timeline, Tasbih, Qibla, Ramadan, Statistics, Settings, Women Mode, and About.
 - Uses Naperville, IL fallback coordinates when no synced location is available.
+- Women Mode can be enabled and Period Pause can be started/ended. During pause, prayer times remain visible, completion/missed tracking/reminders/vibration are disabled, and the day is stored as paused.
+- Statistics include today completed, missed, weekly/monthly completion, current streak, longest streak, and paused days.
+- Qibla calculates bearing to the Kaaba from stored/default coordinates and falls back safely when compass heading is unavailable.
+- Ramadan screen shows estimated Ramadan day, Fajr cutoff, Maghrib/Iftar, fasting duration, and countdowns.
+- Tasbih supports 33, 99, and Unlimited modes with persisted count/mode.
 
 ## Build
 
@@ -115,6 +120,12 @@ See `INSTALL.md` for private sharing and manual installation notes.
 
 This Garmin app is a lightweight watch companion. It does not request GPS/location permission yet; it uses stored/default Naperville coordinates and defensive timezone handling for simulator, DST, reboot, and missing date fields.
 
+Garmin API limitations:
+
+- True background notifications are limited for a simple foreground Connect IQ watch-app. The app checks reminders while it is open/running and vibrates through `Toybox.Attention` when supported.
+- Compass/sensor heading is optional. The current build avoids requiring Sensor permission and always keeps the Qibla screen safe with a calculated bearing fallback.
+- Ramadan detection uses the app's lightweight Hijri estimate, so the screen is useful but not a formal moon-sighting authority.
+
 ## Simulator Test Checklist
 
 Build commands used for the current app:
@@ -129,8 +140,11 @@ Simulator checks:
 - fēnix E (`fenixe`): launch with `monkeydo bin/SalahCompanion-fenixe.prg fenixe`; verify no IQ error, Home shows Hijri date at top, countdown, progress bar, and action row inside the round display.
 - vívoactive 5 (`vivoactive5`): launch with `monkeydo bin/SalahCompanion-vivoactive5.prg vivoactive5`; leave open past one minute and verify no crash or frozen countdown.
 - Large round screen (`fenix7x`): launch with `monkeydo bin/SalahCompanion-fenix7x.prg fenix7x`; verify text remains centered and not clipped.
-- Press Up/Down through Home, Prayer List, Timeline, Tasbih, Settings, About.
+- Press Up/Down through Home, Prayer Timeline, Tasbih, Qibla, Ramadan, Statistics, Settings, Women Mode, About.
 - On Home, Select toggles the current completable prayer only. Sunrise is never stored as completed.
 - On Tasbih, Select increments and Back resets.
+- On Women Mode, Select starts/ends Period Pause. Confirm Home only shows subtle pause text.
+- Verify Qibla and Ramadan open without IQ error.
+- Verify Statistics updates and paused days do not count as missed.
 - Restart/relaunch the simulator and verify stored prayers/tasbih load without corruption.
 - Change watch/system day or relaunch after date rollover and verify daily completion resets.

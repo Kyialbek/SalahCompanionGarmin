@@ -254,6 +254,12 @@ module CalculationService {
         }
         var hour = minutes / 60;
         var min = minutes % 60;
+        if (StorageService.readBool(StorageService.TIME_FORMAT_KEY, false)) {
+            var hourText = hour < 10 ? "0" + hour : "" + hour;
+            var minuteText = min < 10 ? "0" + min : "" + min;
+            return hourText + ":" + minuteText;
+        }
+
         var suffix = hour >= 12 ? "PM" : "AM";
         var displayHour = hour % 12;
         if (displayHour == 0) {

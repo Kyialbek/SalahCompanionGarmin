@@ -18,6 +18,16 @@ class SalahMenuDelegate extends WatchUi.MenuInputDelegate {
             SalahStorage.toggleHighContrast();
         } else if (item == :vibration_only) {
             SalahStorage.toggleVibrationOnly();
+        } else if (item == :time_format) {
+            StorageService.setValue(StorageService.TIME_FORMAT_KEY, !StorageService.readBool(StorageService.TIME_FORMAT_KEY, false));
+        } else if (item == :vibration_toggle) {
+            NotificationService.toggleVibration();
+        } else if (item == :reminders_toggle) {
+            NotificationService.toggleReminders();
+        } else if (item == :women_mode) {
+            WomenService.toggleEnabled();
+        } else if (item == :period_pause) {
+            WomenService.togglePause();
         } else if (item == :reset_zikr) {
             TasbihService.reset();
         } else if (item == :target_zikr) {

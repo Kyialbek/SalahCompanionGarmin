@@ -9,6 +9,9 @@ module PrayerService {
     }
 
     function isCompleted(key) {
+        if (WomenService.isPauseActive()) {
+            return false;
+        }
         if (!isCompletable(key)) {
             return false;
         }
@@ -22,6 +25,10 @@ module PrayerService {
     }
 
     function togglePrayer(key) {
+        if (WomenService.isPauseActive()) {
+            return;
+        }
+
         if (!isCompletable(key)) {
             return;
         }
@@ -60,6 +67,11 @@ module PrayerService {
 
     function markMissedPastPrayers() {
         StorageService.ensureToday();
+        if (WomenService.isPauseActive()) {
+            StorageService.setValue(StorageService.MISSED_KEY, "");
+            return;
+        }
+
         var minutes = CalculationService.currentMinutes();
         var schedule = CalculationService.todaySchedule();
         for (var i = 0; i < schedule.size(); i += 1) {
@@ -78,7 +90,7 @@ module PrayerService {
 
     function summary() {
         markMissedPastPrayers();
-        var completed = StorageService.tokenCount(StorageService.readString(StorageService.COMPLETED_KEY, ""));
+        var completed = StorageService.completedPrayerCount(StorageService.readString(StorageService.COMPLETED_KEY, ""));
         var missed = StorageService.tokenCount(StorageService.readString(StorageService.MISSED_KEY, ""));
         return {
             "completed" => completed,

@@ -33,6 +33,10 @@ module NotificationService {
     }
 
     function checkDueReminder() {
+        if (!remindersEnabled() || WomenService.isPauseActive()) {
+            return;
+        }
+
         var offset = StorageService.readNumber(StorageService.REMINDER_KEY, -1);
         if (offset < 0) {
             return;
@@ -42,6 +46,9 @@ module NotificationService {
         var schedule = CalculationService.todaySchedule();
         for (var i = 0; i < schedule.size(); i += 1) {
             var prayer = schedule[i];
+            if (!PrayerService.isCompletable(prayer["key"])) {
+                continue;
+            }
             var due = prayer["minutes"] - offset;
             if (now >= due && now <= due + 1) {
                 var key = StorageService.todayKey() + ":" + prayer["key"] + ":" + offset;
@@ -54,6 +61,10 @@ module NotificationService {
     }
 
     function vibrateForOffset(offset) {
+        if (!vibrationEnabled() || WomenService.isPauseActive()) {
+            return;
+        }
+
         if (offset == 0) {
             Attention.vibrate([new Attention.VibeProfile(100, 300), new Attention.VibeProfile(0, 120), new Attention.VibeProfile(100, 500)]);
         } else if (offset <= 5) {
@@ -61,5 +72,21 @@ module NotificationService {
         } else {
             Attention.vibrate([new Attention.VibeProfile(60, 350)]);
         }
+    }
+
+    function remindersEnabled() {
+        return StorageService.readBool(StorageService.REMINDERS_KEY, true);
+    }
+
+    function toggleReminders() {
+        StorageService.setValue(StorageService.REMINDERS_KEY, !remindersEnabled());
+    }
+
+    function vibrationEnabled() {
+        return StorageService.readBool(StorageService.VIBRATION_KEY, true);
+    }
+
+    function toggleVibration() {
+        StorageService.setValue(StorageService.VIBRATION_KEY, !vibrationEnabled());
     }
 }

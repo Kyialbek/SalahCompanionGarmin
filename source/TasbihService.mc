@@ -1,3 +1,5 @@
+using Toybox.Attention;
+
 module TasbihService {
     const TARGETS = [33, 99, 0];
 
@@ -25,6 +27,9 @@ module TasbihService {
             next = 1;
         }
         StorageService.setValue(StorageService.TASBIH_COUNT_KEY, next);
+        if (limit > 0 && next == limit && NotificationService.vibrationEnabled() && !WomenService.isPauseActive()) {
+            Attention.vibrate([new Attention.VibeProfile(70, 180)]);
+        }
         return next;
     }
 

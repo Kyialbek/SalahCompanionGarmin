@@ -10,16 +10,19 @@ module SalahConstants {
     const WHITE = 0xFFFFFF;
 
     const SCREEN_HOME = 0;
-    const SCREEN_PRAYER_LIST = 1;
-    const SCREEN_TIMELINE = 2;
-    const SCREEN_TASBIH = 3;
-    const SCREEN_SETTINGS = 4;
-    const SCREEN_ABOUT = 5;
-    const SCREEN_LAST = 5;
-    const SCREEN_QIBLA = SCREEN_PRAYER_LIST;
-    const SCREEN_RAMADAN = SCREEN_TIMELINE;
-    const SCREEN_STATS = SCREEN_ABOUT;
+    const SCREEN_TIMELINE = 1;
+    const SCREEN_TASBIH = 2;
+    const SCREEN_QIBLA = 3;
+    const SCREEN_RAMADAN = 4;
+    const SCREEN_STATS = 5;
+    const SCREEN_SETTINGS = 6;
+    const SCREEN_WOMEN = 7;
+    const SCREEN_ABOUT = 8;
+    const SCREEN_LAST = 8;
+    const SCREEN_PRAYER_LIST = SCREEN_TIMELINE;
 
     const PRAYER_COUNT = 6;
     const QIBLA_BEARING_NAPERVILLE = 48;
+    const COMPLETABLE_PRAYER_COUNT = 5;
+    const PAUSED_HISTORY_MASK = -1;
 }

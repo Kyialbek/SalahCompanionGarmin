@@ -18,4 +18,9 @@
     <string id="ReminderOffset">Reminder Time</string>
     <string id="HighContrast">High Contrast</string>
     <string id="VibrationOnly">Vibration Only</string>
+    <string id="TimeFormat">12/24 Hour</string>
+    <string id="Vibration">Vibration</string>
+    <string id="Reminders">Reminders</string>
+    <string id="WomenMode">Women Mode</string>
+    <string id="PeriodPause">Period Pause</string>
 </strings>

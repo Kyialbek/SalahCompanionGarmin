@@ -20,6 +20,14 @@ module StorageService {
     const LAST_REMINDER_KEY = "last_reminder_key";
     const LOCATION_LAT_KEY = "location_lat";
     const LOCATION_LON_KEY = "location_lon";
+    const TIME_FORMAT_KEY = "time_format_24h";
+    const VIBRATION_KEY = "vibration_on";
+    const REMINDERS_KEY = "reminders_on";
+    const WOMEN_MODE_KEY = "women_mode";
+    const PAUSE_ACTIVE_KEY = "period_pause_active";
+    const PAUSE_START_KEY = "period_pause_start";
+    const PAUSED_DAYS_KEY = "paused_days";
+    const LAST_PAUSED_DAY_KEY = "last_paused_day";
     const HISTORY_PREFIX = "hist_";
 
     function boot() {
@@ -42,6 +50,9 @@ module StorageService {
             Application.Storage.setValue(COMPLETED_KEY, "");
             Application.Storage.setValue(MISSED_KEY, "");
             Application.Storage.setValue(LAST_REMINDER_KEY, "");
+            if (WomenService.isPauseActive()) {
+                WomenService.markTodayPaused();
+            }
         } else {
             writeTodayHistory();
         }
@@ -52,9 +63,14 @@ module StorageService {
             return;
         }
 
+        if (WomenService.isPauseActive()) {
+            Application.Storage.setValue(historyKey(storedDay), SalahConstants.PAUSED_HISTORY_MASK);
+            return;
+        }
+
         var completed = readString(COMPLETED_KEY, "");
         var completeCount = completedPrayerCount(completed);
-        var missed = 5 - completeCount;
+        var missed = SalahConstants.COMPLETABLE_PRAYER_COUNT - completeCount;
         Application.Storage.setValue(historyKey(storedDay), prayerMask(completed));
 
         if (missed <= 0) {
@@ -191,7 +207,11 @@ module StorageService {
     }
 
     function writeTodayHistory() {
-        Application.Storage.setValue(historyKey(todayKey()), prayerMask(readString(COMPLETED_KEY, "")));
+        if (WomenService.isPauseActive()) {
+            Application.Storage.setValue(historyKey(todayKey()), SalahConstants.PAUSED_HISTORY_MASK);
+        } else {
+            Application.Storage.setValue(historyKey(todayKey()), prayerMask(readString(COMPLETED_KEY, "")));
+        }
     }
 
     function historyMaskForOffset(dayOffset) {
@@ -199,6 +219,9 @@ module StorageService {
         var value = Application.Storage.getValue(historyKey(key));
         if (value == null) {
             if (dayOffset == 0) {
+                if (WomenService.isPauseActive()) {
+                    return SalahConstants.PAUSED_HISTORY_MASK;
+                }
                 return prayerMask(readString(COMPLETED_KEY, ""));
             }
             return 0;
@@ -254,6 +277,20 @@ module StorageService {
             count += 1;
         }
         return count;
+    }
+
+    function readBool(key, fallback) {
+        try {
+            var value = Application.Storage.getValue(key);
+            if (value == null) {
+                Application.Storage.setValue(key, fallback);
+                return fallback;
+            }
+            return value == true;
+        } catch (ex) {
+            Application.Storage.setValue(key, fallback);
+            return fallback;
+        }
     }
 
     function safeNumber(value, fallback) {
