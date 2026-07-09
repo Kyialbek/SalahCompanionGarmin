@@ -60,6 +60,8 @@ module SalahStatsService {
                 continue;
             } else if (completedCount(mask) == SalahConstants.COMPLETABLE_PRAYER_COUNT) {
                 streak += 1;
+            } else if (i == 0 && StorageService.tokenCount(StorageService.readString(StorageService.MISSED_KEY, "")) == 0) {
+                continue;
             } else {
                 return streak;
             }

@@ -31,7 +31,18 @@ module WomenService {
     }
 
     function endPause() {
+        var today = StorageService.todayKey();
+        var pausedToday = StorageService.readNumber(StorageService.LAST_PAUSED_DAY_KEY, 0) == today;
+
         StorageService.setValue(StorageService.PAUSE_ACTIVE_KEY, false);
+        if (pausedToday) {
+            var days = pausedDays();
+            if (days > 0) {
+                StorageService.setValue(StorageService.PAUSED_DAYS_KEY, days - 1);
+            }
+            StorageService.setValue(StorageService.LAST_PAUSED_DAY_KEY, 0);
+        }
+        StorageService.writeTodayHistory();
     }
 
     function markTodayPaused() {

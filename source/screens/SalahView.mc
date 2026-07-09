@@ -232,6 +232,7 @@ class SalahView extends WatchUi.View {
             ["Timing", NotificationService.reminderLabel()]
         ];
         drawSettingsRows(dc, rows);
+        SalahUi.drawText(dc, dc.getWidth() / 2, dc.getHeight() - 16, Graphics.FONT_XTINY, "Press MENU to change", SalahConstants.MUTED);
     }
 
     function drawQibla(dc) {
@@ -354,17 +355,34 @@ class SalahView extends WatchUi.View {
             var textY = y + ((rowH - dc.getFontHeight(Graphics.FONT_TINY)) / 2);
             var isNext = row["key"] == next["key"];
             var isCurrent = row["key"] == currentKey;
-            var isDone = PrayerService.isCompletable(row["key"]) && (PrayerService.isCompleted(row["key"]) || CalculationService.currentMinutes() > row["minutes"]);
-            var color = isNext ? SalahUi.accent() : (isCurrent ? SalahConstants.WHITE : (isDone ? SalahConstants.MUTED : SalahUi.muted()));
+            var isCompletable = PrayerService.isCompletable(row["key"]);
+            var isCompleted = isCompletable && PrayerService.isCompleted(row["key"]);
+            var isPast = CalculationService.currentMinutes() > row["minutes"];
+            var isMissed = isCompletable && !isCompleted && (PrayerService.isMissed(row["key"]) || isPast);
+            var color = SalahUi.muted();
+            var railColor = SalahConstants.DIM;
+
+            if (isCompleted) {
+                color = SalahUi.accent();
+                railColor = SalahConstants.SOFT_ACCENT;
+            } else if (isMissed) {
+                color = SalahConstants.WARNING;
+                railColor = SalahConstants.WARNING;
+            } else if (isNext) {
+                color = SalahUi.accent();
+                railColor = SalahConstants.SOFT_ACCENT;
+            } else if (isCurrent || isPast) {
+                color = SalahConstants.WHITE;
+            }
 
             if (timeline) {
-                dc.setColor(isDone || isNext ? SalahConstants.SOFT_ACCENT : SalahConstants.DIM, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(railColor, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(left + iconR, y, left + iconR, y + rowH);
             }
 
             drawPrayerIcon(dc, left + iconR, y + (rowH / 2), iconR, row["key"], color);
             SalahUi.drawLeftText(dc, left + (iconR * 3), textY, Graphics.FONT_TINY, row["name"], color);
-            dc.setColor(isNext ? SalahConstants.WHITE : SalahConstants.MUTED, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(isNext ? SalahConstants.WHITE : (isMissed ? SalahConstants.WARNING : SalahConstants.MUTED), Graphics.COLOR_TRANSPARENT);
             dc.drawText(right, textY, Graphics.FONT_TINY, row["time"], Graphics.TEXT_JUSTIFY_RIGHT);
         }
     }
@@ -376,7 +394,7 @@ class SalahView extends WatchUi.View {
         var radius = (width < height ? width : height) / 2;
         var y = 16;
         var top = 44;
-        var bottom = height - 24;
+        var bottom = height - 42;
         var rowH = (bottom - top) / rows.size();
         var left = centerX - (radius * 0.56);
         var right = centerX + (radius * 0.56);

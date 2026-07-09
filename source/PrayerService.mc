@@ -40,6 +40,7 @@ module PrayerService {
             StorageService.addToken(StorageService.COMPLETED_KEY, key);
             StorageService.removeToken(StorageService.MISSED_KEY, key);
         }
+        StorageService.writeTodayHistory();
     }
 
     function toggleCurrentPrayer() {
